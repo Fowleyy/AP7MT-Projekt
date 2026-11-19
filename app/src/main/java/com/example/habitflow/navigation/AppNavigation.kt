@@ -15,9 +15,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.habitflow.viewmodel.HabitViewModel
+import com.example.habitflow.ui.screens.HabitsScreen
 
 @Composable
-fun AppNavigation() {
+fun AppNavigation(
+    habitViewModel: HabitViewModel
+) {
     val navController = rememberNavController()
 
     val screens = listOf(
@@ -65,7 +69,11 @@ fun AppNavigation() {
         ) {
             screens.forEach { screen ->
                 composable(screen.route) {
-                    PlaceholderScreen(screen.label)
+                    if (screen.route == "habits") {
+                        HabitsScreen(habitViewModel)
+                    } else {
+                        PlaceholderScreen(screen.label)
+                    }
                 }
             }
         }
