@@ -1,98 +1,122 @@
 package com.example.habitflow.navigation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.ui.graphics.Color
+import androidx.navigation.compose.*
 import com.example.habitflow.viewmodel.HabitViewModel
+import com.example.habitflow.ui.screens.HomeScreen
 import com.example.habitflow.ui.screens.HabitsScreen
+import androidx.compose.ui.unit.dp
+
+private val DarkGreen = Color(0xFF244A3A)
+private val Gray = Color(0xFF929B94)
 
 @Composable
-fun AppNavigation(
-    habitViewModel: HabitViewModel
-) {
+fun AppNavigation(habitViewModel: HabitViewModel) {
+
     val navController = rememberNavController()
 
-    val screens = listOf(
-        Screen("home", "Domů", "🏠"),
-        Screen("habits", "Návyky", "✅"),
-        Screen("statistics", "Statistiky", "📊"),
-        Screen("calendar", "Kalendář", "📅"),
-        Screen("settings", "Nastavení", "⚙️")
+    val items = listOf(
+        NavigationItem("home", "Domů", Icons.Default.Home),
+        NavigationItem("habits", "Návyky", Icons.Default.CheckCircle),
+        NavigationItem("statistics", "Statistiky", Icons.Default.BarChart),
+        NavigationItem("calendar", "Kalendář", Icons.Default.CalendarMonth),
+        NavigationItem("settings", "Nastavení", Icons.Default.Settings)
     )
+
+    val currentRoute = navController
+        .currentBackStackEntryAsState()
+        .value?.destination?.route
 
     Scaffold(
         bottomBar = {
-            NavigationBar {
-                val navBackStackEntry =
-                    navController.currentBackStackEntryAsState()
-
-                val currentRoute =
-                    navBackStackEntry.value?.destination?.route
-
-                screens.forEach { screen ->
+            NavigationBar(
+                containerColor = Color.White,
+                tonalElevation = 0.dp
+            ) {
+                items.forEach { item ->
                     NavigationBarItem(
-                        selected = currentRoute == screen.route,
+                        selected = currentRoute == item.route,
                         onClick = {
-                            navController.navigate(screen.route) {
+                            navController.navigate(item.route) {
+                                popUpTo("home") {
+                                    saveState = true
+                                }
                                 launchSingleTop = true
                                 restoreState = true
                             }
                         },
                         icon = {
-                            Text(screen.icon)
+                            Icon(
+                                imageVector = item.icon,
+                                contentDescription = item.label
+                            )
                         },
                         label = {
-                            Text(screen.label)
-                        }
+                            Text(item.label)
+                        },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = DarkGreen,
+                            selectedTextColor = DarkGreen,
+                            unselectedIconColor = Gray,
+                            unselectedTextColor = Gray,
+                            indicatorColor = Color(0xFFE2EDE4)
+                        )
                     )
                 }
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
 
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.padding(paddingValues)
+            modifier = Modifier.padding(padding)
         ) {
-            screens.forEach { screen ->
-                composable(screen.route) {
-                    if (screen.route == "habits") {
-                        HabitsScreen(habitViewModel)
-                    } else {
-                        PlaceholderScreen(screen.label)
-                    }
-                }
+            composable("home") {
+                HomeScreen(habitViewModel)
+            }
+
+            composable("habits") {
+                HabitsScreen(habitViewModel)
+            }
+
+            composable("statistics") {
+                PlaceholderScreen("Statistiky")
+            }
+
+            composable("calendar") {
+                PlaceholderScreen("Kalendář")
+            }
+
+            composable("settings") {
+                PlaceholderScreen("Nastavení")
             }
         }
     }
 }
 
-data class Screen(
+private data class NavigationItem(
     val route: String,
     val label: String,
-    val icon: String
+    val icon: androidx.compose.ui.graphics.vector.ImageVector
 )
 
 @Composable
 fun PlaceholderScreen(title: String) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier.padding(),
+        contentAlignment = androidx.compose.ui.Alignment.Center
     ) {
-        Text(text = title)
+        Text(title)
     }
 }
