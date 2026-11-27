@@ -18,19 +18,20 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val database = DatabaseProvider.getDatabase(applicationContext)
-        val repository = HabitRepository(database.habitDao())
+
+        val repository = HabitRepository(
+            habitDao = database.habitDao(),
+            completionDao = database.habitCompletionDao()
+        )
+
         val factory = HabitViewModelFactory(repository)
 
         setContent {
-            val habitViewModel: HabitViewModel = viewModel(
-                factory = factory
-            )
+            val habitViewModel: HabitViewModel = viewModel(factory = factory)
 
             MaterialTheme {
                 Surface {
-                    AppNavigation(
-                        habitViewModel = habitViewModel
-                    )
+                    AppNavigation(habitViewModel = habitViewModel)
                 }
             }
         }
