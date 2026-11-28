@@ -15,6 +15,7 @@ import androidx.navigation.compose.*
 import com.example.habitflow.viewmodel.HabitViewModel
 import com.example.habitflow.ui.screens.HomeScreen
 import com.example.habitflow.ui.screens.HabitsScreen
+import com.example.habitflow.ui.screens.StatisticsScreen
 import androidx.compose.ui.unit.dp
 
 private val DarkGreen = Color(0xFF244A3A)
@@ -91,7 +92,7 @@ fun AppNavigation(habitViewModel: HabitViewModel) {
             }
 
             composable("statistics") {
-                PlaceholderScreen("Statistiky")
+                StatisticsScreen(habitViewModel)
             }
 
             composable("calendar") {
